@@ -1,46 +1,46 @@
-
-    let subjects = [];
+let subjects = JSON.parse(localStorage.getItem("subjects")) || [];
 
 function addSubject() {
 
-    const subjectInput = document.getElementById("subject");
-    const difficultyInput = document.getElementById("difficulty");
-    const hoursInput = document.getElementById("hours");
-    const examDateInput = document.getElementById("examDate");
-
-    const subject = subjectInput.value.trim();
-    const difficulty = difficultyInput.value;
-    const hours = Number(hoursInput.value);
-    const examDate = examDateInput.value;
+    const subject = document.getElementById("subject").value.trim();
+    const difficulty = document.getElementById("difficulty").value;
+    const hours = Number(document.getElementById("hours").value);
+    const examDate = document.getElementById("examDate").value;
 
     if (subject === "" || hours <= 0 || examDate === "") {
-        alert("Please enter subject, study hours and exam date.");
+        alert("Please enter all details.");
         return;
     }
 
-    const newSubject = {
+    subjects.push({
         name: subject,
         difficulty: difficulty,
         hours: hours,
         examDate: examDate,
         completed: false
-    };
+    });
 
-    subjects.push(newSubject);
+    saveData();
+
+    document.getElementById("subject").value = "";
+    document.getElementById("hours").value = "";
+    document.getElementById("examDate").value = "";
 
     displaySubjects();
     updateProgress();
     updateExamCountdown();
-
-    subjectInput.value = "";
-    hoursInput.value = "";
-    examDateInput.value = "";
 }
 
 
 function displaySubjects() {
 
     const subjectList = document.getElementById("subjectList");
+
+    if (subjects.length === 0) {
+        subjectList.innerHTML =
+            '<p class="empty">No subjects added yet.</p>';
+        return;
+    }
 
     subjectList.innerHTML = "";
 
@@ -52,17 +52,18 @@ function displaySubjects() {
 
         subjectDiv.innerHTML = `
             <strong>📚 ${subject.name}</strong>
-
             <span>Difficulty: ${subject.difficulty}</span><br>
-
             <span>Study Hours: ${subject.hours} hour(s)</span><br>
-
             <span>📅 Exam: ${subject.examDate}</span>
 
             <button onclick="completeSubject(${index})">
                 ${subject.completed
-                    ? "✅ Completed"
+                    ? "↩️ Mark as Pending"
                     : "☑️ Mark as Completed"}
+            </button>
+
+            <button onclick="deleteSubject(${index})">
+                🗑️ Delete
             </button>
         `;
 
@@ -73,17 +74,41 @@ function displaySubjects() {
 
 function completeSubject(index) {
 
-    subjects[index].completed = !subjects[index].completed;
+    subjects[index].completed =
+        !subjects[index].completed;
+
+    saveData();
 
     displaySubjects();
     updateProgress();
+    updateExamCountdown();
+}
+
+
+function deleteSubject(index) {
+
+    const confirmDelete =
+        confirm("Are you sure you want to delete this subject?");
+
+    if (!confirmDelete) return;
+
+    subjects.splice(index, 1);
+
+    saveData();
+
+    displaySubjects();
+    updateProgress();
+    updateExamCountdown();
 }
 
 
 function updateProgress() {
 
-    const progressBar = document.getElementById("progress");
-    const progressText = document.getElementById("progressText");
+    const progressBar =
+        document.getElementById("progress");
+
+    const progressText =
+        document.getElementById("progressText");
 
     if (subjects.length === 0) {
 
@@ -93,9 +118,10 @@ function updateProgress() {
         return;
     }
 
-    const completedSubjects = subjects.filter(
-        subject => subject.completed
-    ).length;
+    const completedSubjects =
+        subjects.filter(
+            subject => subject.completed
+        ).length;
 
     const percentage = Math.round(
         (completedSubjects / subjects.length) * 100
@@ -110,41 +136,44 @@ function updateProgress() {
 
 function updateExamCountdown() {
 
-    const examInfo = document.getElementById("examInfo");
+    const examInfo =
+        document.getElementById("examInfo");
 
-    if (subjects.length === 0) {
-        examInfo.innerText =
-            "Add a subject with an exam date to see the countdown.";
-        return;
-    }
-
-    // Find the nearest upcoming exam
     const upcomingSubjects = subjects
         .filter(subject => !subject.completed)
         .sort(
             (a, b) =>
-                new Date(a.examDate) - new Date(b.examDate)
+                new Date(a.examDate) -
+                new Date(b.examDate)
         );
 
     if (upcomingSubjects.length === 0) {
+
         examInfo.innerText =
             "🎉 All subjects are completed!";
+
         return;
     }
 
     const nextExam = upcomingSubjects[0];
 
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
 
-    const examDay = new Date(nextExam.examDate);
+    const examDay =
+        new Date(nextExam.examDate);
+
     examDay.setHours(0, 0, 0, 0);
 
     const difference =
         examDay.getTime() - today.getTime();
 
     const daysLeft =
-        Math.ceil(difference / (1000 * 60 * 60 * 24));
+        Math.ceil(
+            difference /
+            (1000 * 60 * 60 * 24)
+        );
 
     if (daysLeft > 0) {
 
@@ -169,3 +198,18 @@ function updateExamCountdown() {
         `;
     }
 }
+
+
+function saveData() {
+
+    localStorage.setItem(
+        "subjects",
+        JSON.stringify(subjects)
+    );
+}
+
+
+// Load saved data when website opens
+displaySubjects();
+updateProgress();
+updateExamCountdown();
