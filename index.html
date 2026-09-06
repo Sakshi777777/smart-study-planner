@@ -18,13 +18,14 @@
 
     <main>
 
+        <!-- Study Plan Form -->
         <section class="planner-card">
 
-            <h2>Create Your Study Plan</h2>
+            <h2>📝 Create Your Study Plan</h2>
 
             <label>Subject Name</label>
             <input 
-                type="text" 
+                type="text"
                 id="subject"
                 placeholder="e.g. Mathematics"
             >
@@ -37,11 +38,17 @@
             </select>
 
             <label>Study Hours</label>
-            <input 
-                type="number" 
+            <input
+                type="number"
                 id="hours"
                 placeholder="e.g. 2"
                 min="1"
+            >
+
+            <label>Exam Date</label>
+            <input
+                type="date"
+                id="examDate"
             >
 
             <button onclick="addSubject()">
@@ -51,9 +58,22 @@
         </section>
 
 
+        <!-- Exam Information -->
+        <section class="exam-card">
+
+            <h2>📅 Exam Countdown</h2>
+
+            <p id="examInfo">
+                Add a subject with an exam date to see the countdown.
+            </p>
+
+        </section>
+
+
+        <!-- Subjects -->
         <section class="subjects-card">
 
-            <h2>📖 Your Subjects</h2>
+            <h2>📚 Your Subjects</h2>
 
             <div id="subjectList">
                 <p class="empty">
@@ -64,6 +84,7 @@
         </section>
 
 
+        <!-- Progress -->
         <section class="progress-card">
 
             <h2>📊 Study Progress</h2>
@@ -82,7 +103,9 @@
 
 
     <footer>
-        <p>🚀 Smart Study Planner | Built with HTML, CSS & JavaScript</p>
+        <p>
+            🚀 Smart Study Planner | Built with HTML, CSS & JavaScript
+        </p>
     </footer>
 
 
